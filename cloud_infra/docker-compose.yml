@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  composition_engine:
+    build:
+      context: ../composition_engine
+      dockerfile: Dockerfile
+    environment:
+      - AWS_REGION=${AWS_REGION}
+      - DYNAMODB_TABLE=${DYNAMODB_TABLE}
+    volumes:
+      - ../composition_engine:/app
+    networks:
+      - composemind_network
+
+  embedding_service:
+    build:
+      context: ../embedding_layer
+      dockerfile: Dockerfile
+    environment:
+      - AWS_REGION=${AWS_REGION}
+      - DYNAMODB_TABLE=${DYNAMODB_TABLE}
+    volumes:
+      - ../embedding_layer:/app
+    networks:
+      - composemind_network
+
+  ui:
+    build:
+      context: ../comparison_ui
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../comparison_ui:/app
+    networks:
+      - composemind_network
+
+networks:
+  composemind_network:
+    driver: bridge
